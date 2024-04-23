@@ -1,3 +1,4 @@
 streamlit==1.33.0
-google-generativeai==1.0.0 
+google-generativeai
+langchain==0.0.344
 nltk==3.6.5
