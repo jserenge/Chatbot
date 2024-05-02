@@ -78,7 +78,7 @@ conversation_area = st.empty()
 # Conversation loop
 while True:
     # Get user input
-    user_message = st.text_input("You:")
+    user_message = conversation_area.text_input("You:")
     if user_message:
         # Display user input in conversation area
         conversation_area.markdown(f"**You:** {user_message}")
