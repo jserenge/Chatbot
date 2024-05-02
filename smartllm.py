@@ -65,8 +65,6 @@ def respond_to_query(query):
         conversation_context += " " + response
 
     return response
-
-
 # Streamlit code starts here
 st.title("DatapositAI")
 # Greet the user
@@ -76,9 +74,11 @@ st.write("Welcome to PositAI! How can I assist you today?")
 conversation_area = st.empty()
 
 # Conversation loop
+conversation_counter = 0
 while True:
     # Get user input
-    user_message = conversation_area.text_input("You:")
+    user_message = conversation_area.text_input("You:", key=f"user_input_{conversation_counter}")
+    conversation_counter += 1
     if user_message:
         # Display user input in conversation area
         conversation_area.markdown(f"**You:** {user_message}")
