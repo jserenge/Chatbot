@@ -35,56 +35,61 @@ model = genai.GenerativeModel(model_name="models/gemini-pro")
 conversation_context = ""
 
 # Define a function to handle user queries and generate responses
-def respond_to_query(query):
+def respond_to_query(query, check_keywords=False):
     global conversation_context
     query = query.lower()  # Convert the query to lower case
 
-    # Check for keywords in the query and respond accordingly
-    if "company" in query or "business" in query or "organization" in query:
-        response = company_info["about"]
-    elif "team" in query or "staff" in query or "employees" in query:
-        response = company_info["team"]
-    elif "leadership" in query or "executives" in query or "management" in query:
-        response = "The leadership team of DataposIT Limited consists of:\n"
-        for role, leader in company_info["leadership"].items():
-            response += f"- {role}: {leader}\n"
-    elif "partnerships" in query or "affiliations" in query:
-        response = "Our company has the following partnerships:\n"
-        response += "\nBusiness Apps Partnerships:\n"
-        for partner in company_info["partnerships"]["business_apps"]:
-            response += f"- {partner}\n"
-        response += "\nInfrastructure Partnerships:\n"
-        for partner in company_info["partnerships"]["infrastructure"]:
-            response += f"- {partner}\n"
-    else:
-        # If the query doesn't match any of the predefined ones, use the Gemini model to generate a response
-        instructions =  "Instructions: Respond to the query."
-        message = f"Instructions:{instructions} Message description: {conversation_context} {query}"
-        response = model.generate_content(message).text
-        # Update the conversation context
-        conversation_context += " " + response
+    # Define a list of ERP and infrastructure-related keywords
+    erp_keywords = ["erp", "microsoft business central", "business central", "enterprise resource planning"]
+    infrastructure_keywords = ["vmware", "veeam", "netapp", "citrix", "infrastructure"]
+
+    # Check if the query contains any of the ERP or infrastructure-related keywords
+    if check_keywords and not any(keyword in query for keyword in erp_keywords + infrastructure_keywords):
+        # If the query doesn't contain any of the ERP or infrastructure-related keywords, return a default message
+        return "I'm sorry, I can only provide information on ERPs and infrastructure."
+
+    # Check if the query is in the company_info dictionary
+    if query in company_info:
+        # If it is, return the corresponding value
+        return company_info[query]
+
+    # If the query doesn't match any of the predefined ones, use the Gemini model to generate a response
+    instructions =  "Instructions: Respond to the query."
+    message = f"Instructions:{instructions} Message description: {conversation_context} {query}"
+    response = model.generate_content(message).text
+    # Update the conversation context
+    conversation_context += " " + response
 
     return response
+
 # Streamlit code starts here
 st.title("DatapositAI")
+
 # Greet the user
 st.write("Welcome to PositAI! How can I assist you today?")
 
-# Define a conversation window
-conversation_area = st.empty()
+# Define the options for the dropdown menu
+options = ["About", "Team", "Mission", "Vision and Values", "Leadership", "Clients", "Partnerships"]
 
-# Conversation loop
-conversation_counter = 0
-while True:
-    # Get user input
-    user_message = conversation_area.text_input("You:", key=f"user_input_{conversation_counter}")
-    conversation_counter += 1
-    if user_message:
-        # Display user input in conversation area
-        conversation_area.markdown(f"**You:** {user_message}")
+# Create the dropdown menu and get the selected option
+selected_option = st.selectbox("Choose an option:", options)
 
-        # Get bot response
-        bot_response = respond_to_query(user_message)
+# Get bot response for the selected option
+bot_response = respond_to_query(selected_option)
 
-        # Display bot response in conversation area
-        conversation_area.markdown(f"**Bot:** {bot_response}")
+# Display bot response
+st.write(bot_response)
+
+# Get user input
+user_message = st.text_input("Do you need additional help? If yes, please type your issue below:")
+
+# Add a button to trigger the bot's response
+if st.button('Send'):
+    # Display user input in conversation area
+    st.markdown(f"**You:** {user_message}")
+
+    # Get bot response
+    bot_response = respond_to_query(user_message, check_keywords=True)
+
+    # Display bot response in conversation area
+    st.markdown(f"**Bot:** {bot_response}")
