@@ -68,9 +68,23 @@ def respond_to_query(query):
 
 
 # Streamlit code starts here
-st.title("PositAI")
-# Main loop: wait for the user to input a message, respond using the chatbot
-user_message = st.text_input("User")
-if user_message:
-    chatbot_response = respond_to_query(user_message)
-    st.markdown(f"**Chatbot:** {chatbot_response}")
+st.title("DatapositAI")
+# Greet the user
+st.write("Welcome to PositAI! How can I assist you today?")
+
+# Define a conversation window
+conversation_area = st.empty()
+
+# Conversation loop
+while True:
+    # Get user input
+    user_message = st.text_input("You:")
+    if user_message:
+        # Display user input in conversation area
+        conversation_area.markdown(f"**You:** {user_message}")
+
+        # Get bot response
+        bot_response = respond_to_query(user_message)
+
+        # Display bot response in conversation area
+        conversation_area.markdown(f"**Bot:** {bot_response}")
