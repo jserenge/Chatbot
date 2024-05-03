@@ -6,7 +6,7 @@ import warnings
 # To ignore all warnings
 warnings.filterwarnings("ignore")
 
-# Define a dictionary to hold the information about your company
+# Define company information
 company_info = {
     "about": "DataposIT Limited is a leading IT solutions integrator specializing in business applications, infrastructure, managed services, and IT consultancy services. The company is dedicated to providing state-of-the-art IT solutions to its clients and is capable of both informing and implementing complex solutions for businesses of all sizes",
     "team": "The team at DataposIT Limited is comprised of highly trained professionals whose collective IT industry knowledge makes the company one of the premier IT firms in the region",
@@ -25,7 +25,7 @@ company_info = {
 }
 
 # Configure the API key for genai
-API_KEY = "AIzaSyDka3NcQmGov-lxU-bKLCjg2fus_dVEe30"
+API_KEY = "YOUR_OPENAI_API_KEY"
 genai.configure(api_key=API_KEY)
 
 # Initialize the Gemini model
@@ -39,21 +39,12 @@ def respond_to_query(query, check_keywords=False):
     global conversation_context
     query = query.lower()  # Convert the query to lower case
 
-    # Define a list of ERP and infrastructure-related keywords
-    erp_keywords = ["erp", "microsoft business central", "business central", "enterprise resource planning"]
-    infrastructure_keywords = ["vmware", "veeam", "netapp", "citrix", "infrastructure"]
-
-    # Check if the query contains any of the ERP or infrastructure-related keywords
-    if check_keywords and not any(keyword in query for keyword in erp_keywords + infrastructure_keywords):
-        # If the query doesn't contain any of the ERP or infrastructure-related keywords, return a default message
-        return "I'm sorry, I can only provide information on ERPs and infrastructure."
-
-    # Check if the query is in the company_info dictionary
+    # Check if the query contains any of the company information keys
     if query in company_info:
-        # If it is, return the corresponding value
+        # If it does, return the corresponding value
         return company_info[query]
 
-    # If the query doesn't match any of the predefined ones, use the Gemini model to generate a response
+    # If the query doesn't match any of the predefined keys, use the Gemini model to generate a response
     instructions =  "Instructions: Respond to the query."
     message = f"Instructions:{instructions} Message description: {conversation_context} {query}"
     response = model.generate_content(message).text
@@ -65,23 +56,17 @@ def respond_to_query(query, check_keywords=False):
 # Streamlit code starts here
 st.title("DatapositAI")
 
-# Greet the user
-st.write("Welcome to PositAI! How can I assist you today?")
+# Initialize session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Define the options for the dropdown menu
-options = ["About", "Team", "Mission", "Vision and Values", "Leadership", "Clients", "Partnerships"]
-
-# Create the dropdown menu and get the selected option
-selected_option = st.selectbox("Choose an option:", options)
-
-# Get bot response for the selected option
-bot_response = respond_to_query(selected_option)
-
-# Display bot response
-st.write(bot_response)
+# Display chat history
+for message in st.session_state.messages:
+    with st.empty():
+        st.markdown(f"**{message['role'].capitalize()}:** {message['content']}")
 
 # Get user input
-user_message = st.text_input("Do you need additional help? If yes, please type your issue below:")
+user_message = st.text_input("What do you want to know about DataposIT? Type here:")
 
 # Add a button to trigger the bot's response
 if st.button('Send'):
@@ -89,7 +74,11 @@ if st.button('Send'):
     st.markdown(f"**You:** {user_message}")
 
     # Get bot response
-    bot_response = respond_to_query(user_message, check_keywords=True)
+    bot_response = respond_to_query(user_message)
 
     # Display bot response in conversation area
     st.markdown(f"**Bot:** {bot_response}")
+
+    # Save messages to session state
+    st.session_state.messages.append({"role": "user", "content": user_message})
+    st.session_state.messages.append({"role": "bot", "content": bot_response})
