@@ -25,7 +25,7 @@ company_info = {
 }
 
 # Configure the API key for genai
-API_KEY = "YOUR_OPENAI_API_KEY"
+API_KEY = "AIzaSyDka3NcQmGov-lxU-bKLCjg2fus_dVEe30"
 genai.configure(api_key=API_KEY)
 
 # Initialize the Gemini model
