@@ -43,6 +43,11 @@ def respond_to_query(query, check_keywords=False):
     if query in company_info:
         # If it does, return the corresponding value
         return company_info[query]
+    
+    # Check if the query is "your company"
+    if query == "your company":
+        # If it is, return the "about" information from the company_info dictionary
+        return company_info["about"]
 
     # If the query doesn't match any of the predefined keys, use the Gemini model to generate a response
     instructions =  "Instructions: Respond to the query."
@@ -52,6 +57,7 @@ def respond_to_query(query, check_keywords=False):
     conversation_context += " " + response
 
     return response
+
 
 # Streamlit code starts here
 st.title("DatapositAI")
