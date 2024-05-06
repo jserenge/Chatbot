@@ -42,10 +42,16 @@ def respond_to_query(query, check_keywords=False):
     query = query.lower()  # Convert the query to lower case
 
     # Check if the query contains any of the company information keys
-    if query in company_info:
-        # If it does, return the corresponding value
-        return company_info[query]
-    
+    for key, value in company_info.items():
+        if query == key:
+            # If it does, return the corresponding value
+            return value
+        if isinstance(value, dict):
+            # If the value is a dictionary, check if the query is in this dictionary
+            for sub_key, sub_value in value.items():
+                if query == sub_key:
+                    return sub_value
+
     # Check if the query is "your company"
     if query == "your company":
         # If it is, return the "about" information from the company_info dictionary
@@ -59,6 +65,7 @@ def respond_to_query(query, check_keywords=False):
     conversation_context += " " + response
 
     return response
+
 
 # Define a function to load the chat history from a file
 def load_chat_history():
