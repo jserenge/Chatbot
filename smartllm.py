@@ -1,3 +1,5 @@
+import os
+import json
 import streamlit as st
 import google.generativeai as genai
 import time
@@ -58,13 +60,24 @@ def respond_to_query(query, check_keywords=False):
 
     return response
 
+# Define a function to load the chat history from a file
+def load_chat_history():
+    if os.path.exists("chat_history.json"):
+        with open("chat_history.json", "r") as f:
+            return json.load(f)
+    else:
+        return []
+
+# Define a function to save the chat history to a file
+def save_chat_history(chat_history):
+    with open("chat_history.json", "w") as f:
+        json.dump(chat_history, f)
 
 # Streamlit code starts here
 st.title("DatapositAI")
 
-# Initialize session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# Load the chat history at the start of the app
+st.session_state.messages = load_chat_history()
 
 # Display chat history
 for message in st.session_state.messages:
@@ -88,3 +101,6 @@ if st.button('Send'):
     # Save messages to session state
     st.session_state.messages.append({"role": "user", "content": user_message})
     st.session_state.messages.append({"role": "bot", "content": bot_response})
+
+    # Save the chat history
+    save_chat_history(st.session_state.messages)
