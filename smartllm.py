@@ -43,19 +43,14 @@ def respond_to_query(query, check_keywords=False):
 
     # Check if the query contains any of the company information keys
     for key, value in company_info.items():
-        if query == key:
+        if key in query:
             # If it does, return the corresponding value
             return value
         if isinstance(value, dict):
-            # If the value is a dictionary, check if the query is in this dictionary
+            # If the value is a dictionary, check if the query contains any key in this dictionary
             for sub_key, sub_value in value.items():
-                if query == sub_key:
+                if sub_key in query:
                     return sub_value
-
-    # Check if the query is "your company"
-    if query == "your company":
-        # If it is, return the "about" information from the company_info dictionary
-        return company_info["about"]
 
     # If the query doesn't match any of the predefined keys, use the Gemini model to generate a response
     instructions =  "Instructions: Respond to the query."
@@ -65,6 +60,7 @@ def respond_to_query(query, check_keywords=False):
     conversation_context += " " + response
 
     return response
+
 
 
 # Define a function to load the chat history from a file
