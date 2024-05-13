@@ -37,18 +37,22 @@ model = genai.GenerativeModel(model_name="models/gemini-pro")
 conversation_context = ""
 
 # Define a function to handle user queries and generate responses
+# Define a function to handle user queries and generate responses
 def respond_to_query(query, check_keywords=False):
     global conversation_context
     query = query.lower()  # Convert the query to lower case
+    print("Query:", query)  # Add this line to see the query being processed
 
     # Check if the query contains any of the company information keys
     for key, value in company_info.items():
+        print("Checking key:", key)  # Add this line to see which key is being checked
         if key in query:
             # If it does, return the corresponding value
             return value
         if isinstance(value, dict):
             # If the value is a dictionary, check if the query contains any key in this dictionary
             for sub_key, sub_value in value.items():
+                print("Checking sub-key:", sub_key)  # Add this line to see which sub-key is being checked
                 if sub_key in query:
                     return sub_value
 
@@ -60,9 +64,6 @@ def respond_to_query(query, check_keywords=False):
     conversation_context += " " + response
 
     return response
-
-
-
 # Define a function to load the chat history from a file
 def load_chat_history():
     if os.path.exists("chat_history.json"):
